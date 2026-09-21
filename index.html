@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOMAD — 사막의 거대 도시</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d12; font-family: -apple-system, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; color: #e8ecf2; }
+    #c { display: block; width: 100%; height: 100%; }
+    [hidden] { display: none !important; }
+    .panel { position: absolute; background: rgba(12, 14, 20, 0.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; pointer-events: auto; }
+    #hud { top: 14px; left: 14px; min-width: 200px; }
+    #hud h1 { margin: 0 0 4px; font-size: 18px; letter-spacing: 0.24em; font-weight: 700; }
+    #hud .sub { color: #9aa6b8; font-size: 11px; margin-bottom: 8px; }
+    #stats { display: grid; grid-template-columns: auto auto; gap: 1px 12px; color: #c6cfdb; }
+    #stats b { color: #fff; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+    #ctl { top: 14px; right: 14px; width: 264px; }
+    #ctl label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 6px 0; }
+    #ctl input[type=range] { width: 100%; accent-color: #f0b35a; }
+    #ctl .row { display: flex; gap: 6px; }
+    #ctl button { flex: 1; background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 8px; font-size: 12px; cursor: pointer; }
+    #ctl button.on { background: #f0b35a; color: #1a1408; border-color: #f0b35a; }
+    #help { bottom: 14px; left: 14px; color: #b7c1cf; font-size: 11.5px; }
+    #help kbd { background: rgba(255,255,255,0.12); border-radius: 4px; padding: 0 5px; font-family: inherit; }
+    #info { bottom: 14px; right: 14px; min-width: 220px; display: none; }
+    #spots { top: 150px; right: 14px; width: 220px; box-sizing: border-box; } /* 위치·폭은 열 때 컨트롤 패널에 맞춰 계산 */
+    #spots .t { font-weight: 700; font-size: 13px; }
+    #spots input { flex: 1; background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 8px; font-size: 12px; }
+    #spots .slot { display: grid; grid-template-columns: 18px 1fr auto auto auto; gap: 4px; align-items: center; padding: 3px 0; border-top: 1px solid rgba(255,255,255,0.06); font-size: 12px; }
+    #spots .slot .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #dfe6f0; cursor: pointer; }
+    #spots .slot .nm:not(.empty):hover { color: #f0b35a; text-decoration: underline; }
+    #spots .slot .nm.empty { color: #7d8794; font-style: italic; }
+    #spots .slot button { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 3px 7px; font-size: 11px; cursor: pointer; }
+    #spots .slot button.go { background: #f0b35a; color: #1a1408; border-color: #f0b35a; }
+    #spots .hint { color: #9aa6b8; font-size: 10.5px; margin-top: 8px; line-height: 1.4; }
+    #info .t { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    #coord { bottom: 14px; left: 50%; transform: translateX(-50%); font-variant-numeric: tabular-nums; color: #c6cfdb; padding: 6px 12px; }
+    #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: radial-gradient(ellipse at center, #1a1d27 0%, #0b0d12 70%); z-index: 10; transition: opacity 0.6s; }
+    #loading h2 { margin: 0; letter-spacing: 0.3em; font-weight: 700; }
+    #loading p { color: #9aa6b8; margin: 0; }
+    .spin { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.15); border-top-color: #f0b35a; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="loading"><h2>NOMAD</h2><div class="spin"></div><p id="loadmsg">사막 위에 도시를 세우는 중…</p></div>
+  <div id="hud" class="panel">
+    <h1>NOMAD</h1>
+    <div class="sub">위성 시점 · 사막의 거대 도시 10 km × 10 km</div>
+    <div id="stats">
+      <span>건물</span><b id="s-b">–</b>
+      <span>도로 구간</span><b id="s-r">–</b>
+      <span>교통량</span><b id="s-dens">–</b>
+      <span>운행 차량</span><b id="s-c">–</b>
+      <span>차량 최대</span><b id="s-cmax">–</b>
+      <span>보행자</span><b id="s-p">–</b>
+      <span>보행자 최대</span><b id="s-pmax">–</b>
+      <span>나무</span><b id="s-t">–</b>
+      <span>지하철역</span><b id="s-s">–</b>
+      <span>신호등</span><b id="s-sig">–</b>
+      <span>주차장</span><b id="s-park">–</b>
+      <span>고도</span><b id="s-alt">–</b>
+      <span>FPS</span><b id="s-fps">–</b>
+    </div>
+  </div>
+  <div id="ctl" class="panel">
+    <label><span>시각</span><b id="clock">15:00</b></label>
+    <input id="time" type="range" min="0" max="24" step="0.05" value="15" />
+    <div class="row" style="margin-top:8px">
+      <button id="b-t13">오후 1시</button>
+      <button id="b-t18">노을</button>
+      <button id="b-t22">저녁 10시</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button id="b-auto">시간 흐름</button>
+      <button id="b-xray">지하철 X-ray</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button id="b-shadow" class="on">그림자</button>
+      <button id="b-reset">시점 초기화</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button id="b-spot" style="flex:1; width:100%">Spot</button>
+    </div>
+  </div>
+  <div id="spots" class="panel" hidden>
+    <div class="t">저장한 뷰포인트 (최대 10)</div>
+    <div class="row" style="margin:6px 0 8px">
+      <input id="spot-name" type="text" placeholder="이름 입력 후 슬롯의 [저장]" maxlength="24" />
+    </div>
+    <div id="spot-list"></div>
+    <div class="hint">저장: 현재 카메라 위치·방향·시각을 슬롯에 기록 · 이동: 저장한 뷰로 이동 · 브라우저에 보관됩니다</div>
+  </div>
+  <div id="help" class="panel">
+    <kbd>드래그</kbd> 이동 · <kbd>우클릭 드래그</kbd> 회전 · <kbd>휠</kbd> 줌 · <kbd>WASD</kbd> 이동<br />
+    <kbd>↑↓</kbd> 고도 · <kbd>←→</kbd> 회전 · <kbd>V</kbd> 패널 · <kbd>L</kbd> 장노출 · <kbd>T</kbd> 틸트시프트 · <kbd>클릭</kbd> 건물 정보 / 차량 추적 · <kbd>ESC</kbd> 추적 해제 · <kbd>N</kbd> 밤/낮
+  </div>
+  <div id="coord" class="panel">–</div>
+  <div id="info" class="panel"><div class="t" id="info-t"></div><div id="info-b"></div></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
