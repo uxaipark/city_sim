@@ -115,6 +115,8 @@ export class Signals {
     this.group = new THREE.Group();
     this.group.add(this.vehPole, this.vehLamp, this.vehArrow, this.pedPole, this.pedLamp);
     this.count = veh.length + ped.length;
+    this.vehState = new Int8Array(veh.length).fill(-1);
+    this.pedState = new Int8Array(ped.length).fill(-1);
   }
 
   update(time) {
@@ -122,24 +124,34 @@ export class Signals {
     for (let i = 0; i < nState.length; i++) if (nSignal[i]) nState[i] = signalState((time / CYCLE + nPhase[i]) % 1);
     const set = (arr, k, col, on) => { const f = on ? ON : OFF; arr[k * 3] = col[0] * f; arr[k * 3 + 1] = col[1] * f; arr[k * 3 + 2] = col[2] * f; };
     const vc = this.vehLamp.instanceColor.array;
+    let vehicleChanged = false, pedestrianChanged = false;
     for (let k = 0; k < this.veh.length; k++) {
       const l = this.veh[k], st = nState[l.node], ax = l.axis;
+      if (this.vehState[k] === st) continue;
+      this.vehState[k] = st;
+      vehicleChanged = true;
+      this.vehLamp.instanceColor.addUpdateRange(k * 12, 12);
       const green = st === ax || st === 7 + ax, yellow = st === ax + 2, left = st === 5 + ax;
       set(vc, k * 4, RED, !green && !yellow && !left);
       set(vc, k * 4 + 1, YEL, yellow);
       set(vc, k * 4 + 2, ARROW, left);
       set(vc, k * 4 + 3, GRN, green);
     }
-    this.vehLamp.instanceColor.needsUpdate = true;
+    if (vehicleChanged) this.vehLamp.instanceColor.needsUpdate = true;
     const pc = this.pedLamp.instanceColor.array;
     const blink = (time % 0.6) < 0.3;
     for (let k = 0; k < this.ped.length; k++) {
       const l = this.ped[k], st = nState[l.node];
       const walk = pedAllowed(st, l.axis);
       const ending = st === 7 + (1 - l.axis); // 보행 점멸 (새로 건너기 금지)
+      const display = (walk ? 1 : 0) | (ending ? 2 : 0) | (ending && blink ? 4 : 0);
+      if (this.pedState[k] === display) continue;
+      this.pedState[k] = display;
+      pedestrianChanged = true;
+      this.pedLamp.instanceColor.addUpdateRange(k * 6, 6);
       set(pc, k * 2, RED, !walk && !ending);
       set(pc, k * 2 + 1, GRN, walk || (ending && blink));
     }
-    this.pedLamp.instanceColor.needsUpdate = true;
+    if (pedestrianChanged) this.pedLamp.instanceColor.needsUpdate = true;
   }
 }

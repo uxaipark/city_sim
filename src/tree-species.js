@@ -1,0 +1,23 @@
+// Shared, deterministic species catalogue. Dimensions are in metres.
+export const TREE_SPECIES = [
+  { name: '참나무', shape: 'round', h: 8, r: 3.8, color: 0x507c36 },
+  { name: '대추야자', shape: 'palm', h: 10, r: 3.5, color: 0x60813b },
+  { name: '느티나무', shape: 'wide', h: 10, r: 5, color: 0x557d32 },
+  { name: '단풍나무', shape: 'round', h: 7, r: 3.7, color: 0x788b38 },
+  { name: '은행나무', shape: 'oval', h: 11, r: 3.2, color: 0x8eaa43 },
+  { name: '자작나무', shape: 'oval', h: 10, r: 2.4, color: 0x81a85c },
+  { name: '버드나무', shape: 'weeping', h: 9, r: 4.7, color: 0x779752 },
+  { name: '플라타너스', shape: 'wide', h: 12, r: 5.3, color: 0x648c40 },
+  { name: '벚나무', shape: 'wide', h: 6, r: 3.7, color: 0xd6a4ae },
+  { name: '목련', shape: 'oval', h: 6, r: 2.7, color: 0x54754a },
+  { name: '소나무', shape: 'wide', h: 11, r: 4.1, color: 0x416747 },
+  { name: '전나무', shape: 'cone', h: 13, r: 3.3, color: 0x365e45 },
+  { name: '가문비나무', shape: 'cone', h: 15, r: 3.5, color: 0x486c60 },
+  { name: '삼나무', shape: 'cone', h: 16, r: 2.8, color: 0x456b42 },
+  { name: '사이프러스', shape: 'column', h: 12, r: 1.5, color: 0x3d6439 },
+  { name: '포플러', shape: 'column', h: 14, r: 2.2, color: 0x78964e },
+  { name: '아카시아', shape: 'wide', h: 7, r: 5.2, color: 0x80924a },
+  { name: '올리브나무', shape: 'round', h: 5, r: 3, color: 0x87906a },
+  { name: '유칼립투스', shape: 'oval', h: 14, r: 3.8, color: 0x72988b },
+  { name: '부채야자', shape: 'palm', h: 7, r: 3.1, color: 0x558348 },
+];

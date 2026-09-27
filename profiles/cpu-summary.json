@@ -1,0 +1,219 @@
+{
+  "frames": 600,
+  "elapsedMs": 3233.355041,
+  "msPerFrame": 5.388925068333333,
+  "randomCalls": 137921,
+  "randomCallsPerFrame": 229.86833333333334,
+  "top": [
+    {
+      "name": "update",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 254,
+      "selfMs": 1468.971,
+      "percent": 44.4200080858711
+    },
+    {
+      "name": "update",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/people.js",
+      "line": 144,
+      "selfMs": 1194.397,
+      "percent": 36.117203401387904
+    },
+    {
+      "name": "update",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/signals.js",
+      "line": 122,
+      "selfMs": 88.043,
+      "percent": 2.662319931369884
+    },
+    {
+      "name": "post",
+      "file": "node:inspector",
+      "line": 115,
+      "selfMs": 72.874,
+      "percent": 2.2036266674085265
+    },
+    {
+      "name": "yAt",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 153,
+      "selfMs": 63.648,
+      "percent": 1.924642947103465
+    },
+    {
+      "name": "put",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 267,
+      "selfMs": 60.613,
+      "percent": 1.8328680076794608
+    },
+    {
+      "name": "idmAccel",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 21,
+      "selfMs": 59.069,
+      "percent": 1.7861792081833612
+    },
+    {
+      "name": "maxSpeed",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 140,
+      "selfMs": 51.125,
+      "percent": 1.5459617061127553
+    },
+    {
+      "name": "hcEnd",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 148,
+      "selfMs": 40.33,
+      "percent": 1.2195332148171623
+    },
+    {
+      "name": "chooseNext",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/people.js",
+      "line": 94,
+      "selfMs": 30.218,
+      "percent": 0.9137578647494423
+    },
+    {
+      "name": "sgn",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/people.js",
+      "line": 16,
+      "selfMs": 27.767,
+      "percent": 0.8396424194353619
+    },
+    {
+      "name": "laneOffset",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 147,
+      "selfMs": 21.46,
+      "percent": 0.6489259308201414
+    },
+    {
+      "name": "(garbage collector)",
+      "file": "",
+      "line": 0,
+      "selfMs": 17.3,
+      "percent": 0.5231322741467123
+    },
+    {
+      "name": "signalState",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/signals.js",
+      "line": 12,
+      "selfMs": 16.477,
+      "percent": 0.4982456925500219
+    },
+    {
+      "name": "vehicleAllowed",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/signals.js",
+      "line": 30,
+      "selfMs": 16.396,
+      "percent": 0.4957963449080633
+    },
+    {
+      "name": "frame",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 150,
+      "selfMs": 12.565,
+      "percent": 0.3799512731013549
+    },
+    {
+      "name": "pedAllowed",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/signals.js",
+      "line": 35,
+      "selfMs": 8.797,
+      "percent": 0.26601124946061433
+    },
+    {
+      "name": "beginTurn",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 220,
+      "selfMs": 7.075,
+      "percent": 0.21393993292416125
+    },
+    {
+      "name": "chooseNext",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 184,
+      "selfMs": 6.619,
+      "percent": 0.20015101286572767
+    },
+    {
+      "name": "(anonymous)",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/people.js",
+      "line": 99,
+      "selfMs": 6.289,
+      "percent": 0.1901721891392297
+    },
+    {
+      "name": "step",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/scripts/profile-cpu.mjs",
+      "line": 15,
+      "selfMs": 5.577,
+      "percent": 0.16864212097781586
+    },
+    {
+      "name": "(program)",
+      "file": "",
+      "line": 0,
+      "selfMs": 5.035,
+      "percent": 0.15225265897853738
+    },
+    {
+      "name": "(anonymous)",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 188,
+      "selfMs": 5.03,
+      "percent": 0.15210146467965102
+    },
+    {
+      "name": "yAt",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 153,
+      "selfMs": 2.563,
+      "percent": 0.07750219760913431
+    },
+    {
+      "name": "(anonymous)",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/noise.js",
+      "line": 4,
+      "selfMs": 2.553,
+      "percent": 0.07719980901136164
+    },
+    {
+      "name": "sgn",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/people.js",
+      "line": 16,
+      "selfMs": 2.542,
+      "percent": 0.07686718155381171
+    },
+    {
+      "name": "bezier",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/traffic.js",
+      "line": 165,
+      "selfMs": 2.525,
+      "percent": 0.07635312093759818
+    },
+    {
+      "name": "addUpdateRange",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/node_modules/three/build/three.core.js",
+      "line": 17095,
+      "selfMs": 2.522,
+      "percent": 0.07626240435826638
+    },
+    {
+      "name": "object.rng",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/scripts/profile-cpu.mjs",
+      "line": 14,
+      "selfMs": 1.279,
+      "percent": 0.03867550165512399
+    },
+    {
+      "name": "(anonymous)",
+      "file": "file:///Users/uxaipark/dev/city_sim/city_sim/src/people.js",
+      "line": 102,
+      "selfMs": 1.265,
+      "percent": 0.03825215761824226
+    }
+  ]
+}

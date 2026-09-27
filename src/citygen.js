@@ -1,4 +1,5 @@
 // 절차적 도시 레이아웃 생성: 도로망(그래프), 블록, 건물, 공원/숲, 강, 지하철
+import { TREE_SPECIES } from './tree-species.js';
 import { fbm2, hash2, mulberry32, smoothstep } from './noise.js';
 
 export const P = 110;            // 블록 피치 (m)
@@ -472,7 +473,35 @@ export function generateCity(seed = 7) {
     }
     return false;
   };
-  for (const [ck, tree] of parkTreeCands) if (!nearSeg(ck, tree.x, tree.z, 5)) trees.push(tree);
+  // Separate PRNG: richer planting must not change roads/buildings/subway seeds.
+  const forestRng = mulberry32(seed ^ 0x51f15e);
+  const planted = new Map();
+  const plant = (ck, tree) => {
+    if (nearSeg(ck, tree.x, tree.z, 5)) return;
+    const gx = Math.floor(tree.x / 3), gz = Math.floor(tree.z / 3);
+    for (let ix = gx - 1; ix <= gx + 1; ix++) for (let iz = gz - 1; iz <= gz + 1; iz++) {
+      const neighbors = planted.get(`${ix},${iz}`);
+      if (neighbors?.some((t) => (t.x - tree.x) ** 2 + (t.z - tree.z) ** 2 < 9)) return;
+    }
+    tree.kind = Math.floor(forestRng() * TREE_SPECIES.length);
+    tree.park = true;
+    trees.push(tree);
+    const key = `${gx},${gz}`;
+    if (!planted.has(key)) planted.set(key, []);
+    planted.get(key).push(tree);
+  };
+  for (const [ck, tree] of parkTreeCands) plant(ck, tree);
+  // Add layered woodland, retaining five-metre clear corridors along paths.
+  for (const b of parkBlocks) {
+    const extra = Math.floor((b.x1 - b.x0) * (b.z1 - b.z0) / 65);
+    for (let k = 0; k < extra; k++) {
+      plant(idx(b.i, b.j), {
+        x: b.x0 + 4 + forestRng() * (b.x1 - b.x0 - 8),
+        z: b.z0 + 4 + forestRng() * (b.z1 - b.z0 - 8),
+        y: SLAB_H, s: 0.65 + forestRng() * 0.85,
+      });
+    }
+  }
   // 신호 교차로: 도로 3개 이상, 또는 도로 + 다른 축의 공원 진입로(횡단 필요)
   for (const node of nodes) {
     if (node.park) continue;

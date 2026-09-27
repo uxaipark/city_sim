@@ -124,6 +124,10 @@ export class Sky {
   }
 
   update(hour, camera) {
+    // The dome follows the camera even when lighting is unchanged.
+    this.dome.position.copy(camera.position);
+    if (hour === this.lastHour) return;
+    this.lastHour = hour;
     const th = ((hour - 6) / 12) * Math.PI;
     const dir = this.U.uSunDir.value.set(Math.cos(th), Math.sin(th) * 0.85, 0.4).normalize();
     const el = dir.y;
@@ -161,6 +165,5 @@ export class Sky {
     this.hemi.groundColor.setRGB(0.05, 0.045, 0.04).lerp(c2.setRGB(0.55, 0.45, 0.32), duskF);
     this.hemi.intensity = 0.35 + 0.55 * s(-0.1, 0.25, el);
     this.baseExposure = (0.95 + 0.1 * night) * (1.0 - 0.22 * this.uniforms.uDusk.value); // main 에서 자동 노출과 곱해 적용
-    this.dome.position.copy(camera.position);
   }
 }

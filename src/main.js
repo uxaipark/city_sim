@@ -1,3 +1,5 @@
+import { installProfiler } from './profiler.js';
+import { StaticShadowCache } from './static-shadow-cache.js';
 import * as THREE from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
 import { generateCity, downtown } from './citygen.js';
@@ -14,7 +16,7 @@ import { buildParking } from './parking.js';
 import { buildLamps } from './lamps.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { SizedBloomPass } from './bloom.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
@@ -23,7 +25,12 @@ import { buildHaze } from './haze.js';
 import { buildSignage } from './signage.js';
 import { carDensity, pedDensity, highwayDensity, isRushHour } from './schedule.js';
 
-const $ = (id) => document.getElementById(id);
+const elements = new Map();
+const $ = (id) => {
+  if (!elements.has(id)) elements.set(id, document.getElementById(id));
+  return elements.get(id);
+};
+const setText = (id, text) => { const el = $(id); if (el.textContent !== text) el.textContent = text; };
 
 // 공용 유니폼 (모든 셰이더가 참조)
 const U = {
@@ -47,7 +54,10 @@ renderer.toneMappingExposure = 1.05;
 const pr = Math.min(devicePixelRatio, 2);
 const rt = new THREE.WebGLRenderTarget(innerWidth * pr, innerHeight * pr, { samples: 4, type: THREE.HalfFloatType });
 const composer = new EffectComposer(renderer, rt);
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.45, 1.0);
+// A supplied render target is already in physical pixels. Reset the composer's
+// logical size before adding passes so DPR is applied exactly once.
+composer.setSize(innerWidth, innerHeight);
+const bloom = new SizedBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.45, 1.0, 1, pr);
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xcfd8e2, 0.000032);
 const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 1, 120000);
@@ -64,7 +74,7 @@ controls.target.copy(HOME.target);
 
 composer.addPass(new RenderPass(scene, camera));
 composer.addPass(bloom);                                            // 1) 좁은 블룸
-const bloomWide = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.1, 1.0, 1.6);
+const bloomWide = new SizedBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.1, 1.0, 1.6, 0.5, pr);
 composer.addPass(bloomWide);                                        // 1) 넓은 블룸 (다단)
 const streak = new ShaderPass(StreakShader); streak.uniforms.uThreshold.value = 1.9; streak.uniforms.uTexel.value = new THREE.Vector2(1 / innerWidth, 1 / innerHeight);
 composer.addPass(streak);                                           // 2) 스타버스트 광선
@@ -78,7 +88,7 @@ composer.addPass(grain);                                            // 3) 비네
 // 10) 자동 노출: 저해상도 렌더의 평균 휘도로 노출을 서서히 맞춘다
 const expoRT = new THREE.WebGLRenderTarget(24, 24, { type: THREE.FloatType, depthBuffer: true });
 const expoBuf = new Float32Array(24 * 24 * 4);
-let autoExpo = 1, autoExpoTarget = 1, expoFrame = 0;
+let autoExpo = 1, autoExpoTarget = 1, expoFrame = 0, expoPending = false;
 const sun = new THREE.DirectionalLight(0xffffff, 3);
 sun.castShadow = true;
 sun.shadow.mapSize.set(4096, 4096);
@@ -90,6 +100,7 @@ scene.add(hemi);
 const sky = new Sky(scene, U, sun, hemi, scene.fog, renderer);
 const moon = new THREE.DirectionalLight(0xb9c4e0, 0); scene.add(moon, moon.target); sky.moon = moon;
 
+let profiler;
 let city, traffic, people, subway, signals, lamps, buildingsMesh, treesGroup, signage, hazeGroup;
 let hour = 15, autoTime = false, simTime = 0, shadowsOn = true;
 let follow = null;
@@ -122,16 +133,27 @@ function build() {
   scene.add(people.mesh);
   subway = new Subway(city);
   scene.add(subway.group);
-  window.__nomad = { camera, controls, scene, U, city, composer, passes: { bloom, bloomWide, streak, afterimage, tilt, grain }, haze: hazeGroup, signage, sky, renderer, lamps, traffic, people, subway, signals, atlas: () => buildingsMesh.userData.interior.userData.canvas, setHour: (h) => { hour = h; $('time').value = h; }, setFollow: (i) => { follow = { idx: i }; } };
+  const dynamicCasters = new Set([traffic.carMesh, traffic.busMesh]);
+  treesGroup.traverse(object => dynamicCasters.add(object));
+  // Other current casters are immutable city geometry (including subway entrances).
+  const staticCasters = [];
+  scene.traverse(object => {
+    if (object.isMesh && object.castShadow && !dynamicCasters.has(object)) staticCasters.push(object);
+  });
+  const shadowCache = new StaticShadowCache(renderer, sun, staticCasters);
+  shadowCache.enabled = new URLSearchParams(location.search).get('shadowCache') !== '0';
+  window.__nomad = { shadowCache, camera, controls, scene, U, city, composer, trees: treesGroup, passes: { bloom, bloomWide, streak, afterimage, tilt, grain }, haze: hazeGroup, signage, sky, renderer, lamps, traffic, people, subway, signals, atlas: () => buildingsMesh.userData.interior.userData.canvas, setHour: (h) => { hour = h; $('time').value = h; }, setFollow: (i) => { follow = { idx: i }; } };
 
-  $('s-b').textContent = city.buildings.filter((b) => b.main).length.toLocaleString();
-  $('s-r').textContent = city.edges.filter((e) => !e.path).length.toLocaleString();
-  $('s-cmax').textContent = traffic.n.toLocaleString();
-  $('s-pmax').textContent = people.max.toLocaleString();
-  $('s-t').textContent = city.trees.length.toLocaleString();
-  $('s-s').textContent = city.subwayLines.reduce((a, l) => a + l.stations.length, 0).toLocaleString();
-  $('s-sig').textContent = signals.count.toLocaleString();
-  $('s-park').textContent = `${city.parkingLots.length.toLocaleString()} (${(parking.userData.parkedCount || 0).toLocaleString()}대)`;
+  if (new URLSearchParams(location.search).has('profile')) profiler = installProfiler(window.__nomad);
+
+  setText('s-b', String(city.buildings.filter((b) => b.main).length.toLocaleString()));
+  setText('s-r', String(city.edges.filter((e) => !e.path).length.toLocaleString()));
+  setText('s-cmax', String(traffic.n.toLocaleString()));
+  setText('s-pmax', String(people.max.toLocaleString()));
+  setText('s-t', String(city.trees.length.toLocaleString()));
+  setText('s-s', String(city.subwayLines.reduce((a, l) => a + l.stations.length, 0).toLocaleString()));
+  setText('s-sig', String(signals.count.toLocaleString()));
+  setText('s-park', String(`${city.parkingLots.length.toLocaleString()} (${(parking.userData.parkedCount || 0).toLocaleString()}대)`));
 }
 
 // ---------- UI ----------
@@ -207,6 +229,10 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => keys.delete(e.code));
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  const pixelRatio = Math.min(devicePixelRatio, 2);
+  renderer.setPixelRatio(pixelRatio);
+  bloom.pixelRatio = bloomWide.pixelRatio = pixelRatio;
+  composer.setPixelRatio(pixelRatio);
   renderer.setSize(innerWidth, innerHeight);
   composer.setSize(innerWidth, innerHeight);
   streak.uniforms.uTexel.value.set(1 / innerWidth, 1 / innerHeight);
@@ -259,15 +285,38 @@ canvas.addEventListener('pointermove', (e) => {
 const clock = new THREE.Timer();
 const tmp = new THREE.Vector3(), fwd = new THREE.Vector3(), right = new THREE.Vector3(), offset = new THREE.Vector3();
 let fpsAcc = 0, fpsN = 0, fpsT = 0;
+let densityHour, cd, pd, hd, displayedHour;
+
+// Async readback avoids blocking the CPU until the GPU finishes the frame.
+function measureExposure() {
+  expoPending = true;
+  renderer.readRenderTargetPixelsAsync(expoRT, 0, 0, 24, 24, expoBuf).then(() => {
+    // NaN/Infinity 픽셀(태양 원반 등 극단값)이 섞이면 노출이 NaN 이 되어 화면이 전부 검게 되므로 유효 픽셀만, 값도 상한을 둔다
+    let sum = 0, cnt = 0;
+    for (let i = 0; i < expoBuf.length; i += 4) {
+      const l = 0.2126 * expoBuf[i] + 0.7152 * expoBuf[i + 1] + 0.0722 * expoBuf[i + 2];
+      if (Number.isFinite(l)) { sum += Math.log(0.001 + Math.min(l, 40)); cnt++; }
+    }
+    if (cnt > 0) {
+      const avg = Math.exp(sum / cnt);
+      const t = Math.min(1.1, Math.max(0.6, 0.35 / Math.max(avg, 0.01)));
+      if (Number.isFinite(t)) autoExpoTarget = t;
+    }
+  }).catch((error) => {
+    console.warn('Exposure readback failed; retaining previous exposure', error);
+  }).finally(() => { expoPending = false; });
+}
 
 function frame() {
   requestAnimationFrame(frame);
   clock.update();
-  const dt = Math.min(clock.getDelta(), 0.05);
+  const elapsed = clock.getDelta();
+  profiler?.beginFrame(elapsed);
+  const dt = Math.min(elapsed, 0.05);
   simTime += dt;
   U.uTime.value = simTime;
   if (autoTime) { hour = (hour + dt / 30) % 24; $('time').value = hour; }
-  $('clock').textContent = fmtClock(hour);
+  if (displayedHour !== hour) { setText('clock', fmtClock(hour)); displayedHour = hour; }
   sky.update(hour, camera);
   U.uLate.value = hour >= 22 ? Math.min(1, (hour - 22) / 3) : hour < 5 ? 1 : hour < 6.5 ? 1 - (hour - 5) / 1.5 : 0;
 
@@ -306,20 +355,25 @@ function frame() {
   sun.castShadow = shadowsOn && sky.elevation > 0.04 && dist < 9000;
   const ext = Math.min(4200, Math.max(220, dist * 1.3));
   const sc = sun.shadow.camera;
-  sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext;
-  sc.updateProjectionMatrix();
+  if (sc.left !== -ext || sc.right !== ext || sc.top !== ext || sc.bottom !== -ext) {
+    sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext;
+    sc.updateProjectionMatrix();
+  }
   sun.target.position.copy(controls.target);
   sun.position.copy(controls.target).addScaledVector(U.uSunDir.value, 5000);
   sun.target.updateMatrixWorld();
 
   // 시간대별 밀도 (러시아워 포함)
-  const cd = carDensity(hour), pd = pedDensity(hour), hd = highwayDensity(hour);
-  traffic.setDensity(cd, hd);
-  people.setDensity(pd);
+  if (densityHour !== hour) {
+    cd = carDensity(hour); pd = pedDensity(hour); hd = highwayDensity(hour);
+    traffic.setDensity(cd, hd); people.setDensity(pd);
+    densityHour = hour;
+  }
   signals.update(simTime);
   people.mesh.visible = dist < 2600;
   people.update(dt, controls.target, !people.mesh.visible);
   traffic.update(dt, simTime, people.nodeCross);
+  people.updateRender(camera);
   subway.update(dt);
 
   lamps.userData.update();
@@ -328,44 +382,52 @@ function frame() {
   bloomWide.strength = 0.03 + 0.12 * night;
   streak.uniforms.uStrength.value = 0.1 + 0.3 * night;
   grain.uniforms.uTime.value = simTime; grain.uniforms.uGrain.value = 0.0; // 그레인(지글거림) 제거 요청 grain.uniforms.uVignette.value = 0.22 + 0.2 * night;
-  // 자동 노출 (15프레임마다 24x24 렌더 → 평균 휘도)
-  if (++expoFrame % 15 === 0) {
-    const prevTM = renderer.toneMapping; renderer.toneMapping = THREE.NoToneMapping;
-    renderer.setRenderTarget(expoRT); renderer.render(scene, camera); renderer.setRenderTarget(null);
-    renderer.readRenderTargetPixels(expoRT, 0, 0, 24, 24, expoBuf); renderer.toneMapping = prevTM;
-    // NaN/Infinity 픽셀(태양 원반 등 극단값)이 섞이면 노출이 NaN 이 되어 화면이 전부 검게 되므로 유효 픽셀만, 값도 상한을 둔다
-    let sum = 0, cnt = 0;
-    for (let i = 0; i < expoBuf.length; i += 4) {
-      const l = 0.2126 * expoBuf[i] + 0.7152 * expoBuf[i + 1] + 0.0722 * expoBuf[i + 2];
-      if (Number.isFinite(l)) { sum += Math.log(0.001 + Math.min(l, 40)); cnt++; }
-    }
-    if (cnt > 0) {
-      const avg = Math.exp(sum / cnt);
-      const t = Math.min(1.1, Math.max(0.6, 0.35 / Math.max(avg, 0.01)));
-      if (Number.isFinite(t)) autoExpoTarget = t;
-    }
-  }
+  // Render the exposure sample after the main view to reuse this frame's shadows.
   autoExpo += (autoExpoTarget - autoExpo) * Math.min(1, dt * 1.2);
   if (!Number.isFinite(autoExpo)) autoExpo = 1;
   renderer.toneMappingExposure = (Number.isFinite(sky.baseExposure) ? sky.baseExposure : 1) * autoExpo;
+  treesGroup.userData.update(camera, sun);
+  profiler?.beforeRender();
   composer.render();
+  if (++expoFrame % 15 === 0 && !expoPending) {
+    const prevTM = renderer.toneMapping;
+    const prevAuto = renderer.shadowMap.autoUpdate;
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.shadowMap.autoUpdate = false;
+    try {
+      renderer.setRenderTarget(expoRT);
+      renderer.render(scene, camera);
+    } finally {
+      renderer.setRenderTarget(null);
+      renderer.toneMapping = prevTM;
+      renderer.shadowMap.autoUpdate = prevAuto;
+    }
+    measureExposure();
+  }
 
-  fpsAcc += dt; fpsN++;
-  if ((fpsT += dt) > 0.5) {
-    $('s-fps').textContent = Math.round(fpsN / fpsAcc);
-    $('s-c').textContent = `${traffic.activeCount.toLocaleString()} (고속 ${traffic.highwayCount.toLocaleString()})`;
-    $('s-p').textContent = people.active.toLocaleString();
-    $('s-dens').textContent = `${Math.round(cd * 100)}%${isRushHour(hour) ? ' · 러시아워' : ''}`;
-    $('s-dens').style.color = isRushHour(hour) ? '#f0b35a' : '';
-    $('s-alt').textContent = camera.position.y > 1000 ? `${(camera.position.y / 1000).toFixed(1)} km` : `${Math.round(camera.position.y)} m`;
+  fpsAcc += elapsed; fpsN++;
+  if ((fpsT += elapsed) > 0.5) {
+    setText('s-fps', String(Math.round(fpsN / fpsAcc)));
+    setText('s-c', String(`${traffic.activeCount.toLocaleString()} (고속 ${traffic.highwayCount.toLocaleString()})`));
+    setText('s-p', String(people.active.toLocaleString()));
+    setText('s-dens', String(`${Math.round(cd * 100)}%${isRushHour(hour) ? ' · 러시아워' : ''}`));
+    const densityColor = isRushHour(hour) ? 'rgb(240, 179, 90)' : '';
+    if ($('s-dens').style.color !== densityColor) $('s-dens').style.color = densityColor;
+    setText('s-alt', String(camera.position.y > 1000 ? `${(camera.position.y / 1000).toFixed(1)} km` : `${Math.round(camera.position.y)} m`));
     fpsAcc = fpsN = fpsT = 0;
   }
+  profiler?.endFrame();
 }
 
-setTimeout(() => {
+setTimeout(async () => {
   build();
   const l = $('loading');
   l.style.opacity = '0';
   setTimeout(() => l.remove(), 650);
+  if (new URLSearchParams(location.search).get('verify') === 'shadows') {
+    const { verifyShadows } = await import('../scripts/shadowcheck-browser.mjs');
+    const result = await verifyShadows(window.__nomad);
+    console.info('Shadow verification result:', JSON.stringify(result));
+  }
   frame();
 }, 30);

@@ -37,8 +37,11 @@ export function buildLamps(city, U) {
   group.add(poleMesh, headMesh);
   group.userData.count = spots.length;
   const warm = new THREE.Color(1.0, 0.72, 0.32);
+  let lastNight;
   group.userData.update = () => {
     const night = U.uNight.value;
+    if (night === lastNight) return;
+    lastNight = night;
     headMat.color.copy(warm).multiplyScalar(0.12 + night * 2.2);
   };
   return group;

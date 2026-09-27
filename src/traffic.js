@@ -67,6 +67,8 @@ export class Traffic {
     this.eDx = new Float32Array(E); this.eDz = new Float32Array(E); this.eYa = new Float32Array(E); this.eYb = new Float32Array(E); this.eBridge = new Uint8Array(E);
     this.eHighway = new Uint8Array(E); this.eRamp = new Uint8Array(E);
     this.laneOff = new Int32Array(E + 1);
+    this.eCells = new Int32Array(E);
+    this.laneBase = new Int32Array(E * 6);
     let cells = 0;
     for (const e of city.edges) {
       const id = e.id;
@@ -79,8 +81,16 @@ export class Traffic {
       this.eYa[id] = e.a.y || 0; this.eYb[id] = e.b.y || 0; this.eBridge[id] = e.bridge ? 1 : 0;
       this.eHighway[id] = e.highway ? 1 : 0; this.eRamp[id] = e.ramp ? 1 : 0;
       this.laneOff[id] = cells;
-      cells += 6 * Math.ceil(e.length / CELL);
+      const count = this.eCells[id] = Math.ceil(e.length / CELL);
+      for (let lane = 0; lane < 6; lane++) this.laneBase[id * 6 + lane] = cells + lane * count;
+      cells += 6 * count;
     }
+    // Immutable road frames are reused by every vehicle instead of allocating arrays.
+    this.roadFrames = city.edges.map((e) => [
+      [this.eAx[e.id], this.eAz[e.id], this.eDx[e.id], this.eDz[e.id]],
+      [this.eBx[e.id], this.eBz[e.id], -this.eDx[e.id], -this.eDz[e.id]],
+    ]);
+    this.turnPosition = new THREE.Vector3();
     this.laneOff[E] = cells;
     this.grid = new Uint8Array(cells);
     this.cellRear = new Float32Array(cells); // 셀을 점유한 차량의 꼬리 위치 (엣지 좌표)
@@ -90,11 +100,14 @@ export class Traffic {
     const hwEdges = roadEdges.filter((e) => e.highway);
     const hwElev = hwEdges.filter((e) => e.elevated), hwRadial = hwEdges.filter((e) => !e.elevated);
     this.speedFac = 1;
+    this.routeChoices = new Array(E * 6);
     const n = (this.n = maxCars + maxBuses);
     this.maxCars = maxCars; this.maxBuses = maxBuses;
     // 고속도로 전용 차량군: 인덱스 [0, hwCount) — 고속도로에서만 주행, 별도 시간대 곡선
     this.hwCount = hwEdges.length ? Math.round(maxCars * 0.10) : 0; // 고속도로 용량에 맞춘 비율
     this.activeHw = this.hwCount;
+    this.renderedActiveHw = this.hwCount;
+    this.activeRanges = [[0, this.hwCount], [this.hwCount, maxCars], [maxCars, maxCars + maxBuses]];
     this.activeCars = maxCars; this.activeBuses = maxBuses;
     this.edge = new Int32Array(n); this.dir = new Uint8Array(n); this.lane = new Uint8Array(n); this.laneFrom = new Uint8Array(n);
     this.lat = new Float32Array(n); // 현재 횡방향 오프셋 (m)
@@ -142,9 +155,7 @@ export class Traffic {
   hcEnd(c) { const eid = this.edge[c]; return this.dir[c] ? this.eHcA[eid] : this.eHcB[eid]; }
   // 주행 방향 벡터 (dx, dz) 와 시작점
   frame(eid, d) {
-    const sx = d ? this.eBx[eid] : this.eAx[eid], sz = d ? this.eBz[eid] : this.eAz[eid];
-    const f = d ? -1 : 1;
-    return [sx, sz, this.eDx[eid] * f, this.eDz[eid] * f];
+    return this.roadFrames[eid][d];
   }
   yAt(eid, d, t) {
     if (this.eBridge[eid]) return CAR_Y + bridgeY(this.eLen[eid], Math.min(this.eLen[eid], Math.max(0, t)));
@@ -165,6 +176,8 @@ export class Traffic {
   }
 
   setDensity(density, hwDensity = density) {
+    if (density === this.lastDensity && hwDensity === this.lastHwDensity) return;
+    this.lastDensity = density; this.lastHwDensity = hwDensity;
     const normalMax = this.maxCars - this.hwCount;
     this.activeHw = Math.round(this.hwCount * hwDensity);
     this.activeNormal = Math.max(200, Math.round(normalMax * density));
@@ -181,17 +194,23 @@ export class Traffic {
     const e = this.edges[this.edge[c]];
     const isBus = c >= this.maxCars;
     const node = this.dir[c] ? e.a : e.b;
-    let cands = node.edges.filter((x) => x !== e && !x.path && (!x.oneWay || x.a === node) && (!isBus || x.wide || node.edges.length <= 2));
-    if (c < this.hwCount) {
-      // 고속도로 전용: 고속도로 엣지만. 신호 교차로(도시 진입 지점)로 이어지는 마지막 구간은 피하고 그 전 노드에서 유턴
-      const hw = cands.filter((x) => { if (!x.highway) return false; const far = x.a === node ? x.b : x.a; return far.poly || far.edges.some((y) => y.highway && y !== x); });
-      cands = hw;
-    }
-    let next, nd;
-    if (!cands.length) { next = e; nd = this.dir[c] ^ 1; } // 막다른 길: 유턴 (일방통행 램프는 항상 도로에 연결되어 발생하지 않음)
-    else {
+    // Topology and routing weights are immutable. Cache each incoming edge,
+    // direction and vehicle class without changing candidate or RNG order.
+    const key = e.id * 6 + this.dir[c] * 3 + (c < this.hwCount ? 2 : Number(isBus));
+    let choices = this.routeChoices[key];
+    if (!choices) {
+      let cands = node.edges.filter((x) => x !== e && !x.path && (!x.oneWay || x.a === node) && (!isBus || x.wide || node.edges.length <= 2));
+      if (c < this.hwCount) {
+        cands = cands.filter((x) => { if (!x.highway) return false; const far = x.a === node ? x.b : x.a; return far.poly || far.edges.some((y) => y.highway && y !== x); });
+      }
       let total = 0;
-      const w = cands.map((x) => { let ww = x.axis === e.axis ? 3 : 1; ww *= x.ramp ? 0.9 : x.wide ? 3.5 : e.wide ? 0.3 : 0.7; total += ww; return ww; });
+      const weights = cands.map((x) => { let w = x.axis === e.axis ? 3 : 1; w *= x.ramp ? 0.9 : x.wide ? 3.5 : e.wide ? 0.3 : 0.7; total += w; return w; });
+      choices = this.routeChoices[key] = { cands, weights, total };
+    }
+    const { cands, weights: w, total } = choices;
+    let next, nd;
+    if (!cands.length) { next = e; nd = this.dir[c] ^ 1; }
+    else {
       let r = this.rng() * total, pick = 0;
       for (; pick < cands.length - 1; pick++) { r -= w[pick]; if (r <= 0) break; }
       next = cands[pick];
@@ -247,42 +266,54 @@ export class Traffic {
     this.inTurn[c] = 1;
   }
 
-  update(dt, time, nodeCross) {
-    const { t, v, edge, dir, lane, laneFrom, lat, eLen, maxCars, grid, laneOff, eAxis, eAid, eBid, nextEdge, nextDir, nextLane, inTurn, u, curveL } = this;
-    const nState = this.signals.nState, nSignal = this.signals.nSignal;
-    const ranges = [[0, this.activeHw], [this.hwCount, this.activeCars], [maxCars, maxCars + this.activeBuses]];
-    // 비활성 고속도로 차량은 지하 깊이 내려 숨김 (스케일 0 행렬은 법선 계산이 NaN 이 되어 블룸을 타고 화면 전체를 검게 만든다)
-    { const a = this.carMesh.instanceMatrix.array; for (let c = this.activeHw; c < this.hwCount; c++) { const o = c * 16; a[o] = 1; a[o + 5] = 1; a[o + 10] = 1; a[o + 13] = -400; } }
+  buildOccupancy() {
+    const { grid, maxCars, inTurn, dir, eAid, eBid, edge, nextEdge, eCells, laneBase,
+      nextDir, nextLane, u, curveL, v, t, lane, laneFrom } = this;
+    const ranges = this.activeRanges;
+    const cellRear = this.cellRear, cellV = this.cellV;
+    const put = (idx, rear, speed, mark) => {
+      if (!grid[idx] || rear < cellRear[idx]) { cellRear[idx] = rear; cellV[idx] = speed; }
+      grid[idx] = grid[idx] === 2 ? 2 : mark;
+    };
     // 1) 차선 점유 격자
     grid.fill(0); this.nodeTurn.fill(0);
     for (const [s0, s1] of ranges) {
       for (let c = s0; c < s1; c++) {
         const half = c >= maxCars ? 5.5 : 2.2;
         const mark = v[c] < 0.4 ? 2 : 1;
-        const cellRear = this.cellRear, cellV = this.cellV;
-        const put = (idx, rear, vv) => { if (!grid[idx] || rear < cellRear[idx]) { cellRear[idx] = rear; cellV[idx] = vv; } grid[idx] = grid[idx] === 2 ? 2 : mark; };
         if (inTurn[c]) {
           if (this.turn[c] === 2) { const nid = dir[c] ? eAid[edge[c]] : eBid[edge[c]]; this.nodeTurn[nid]++; }
           const ne = nextEdge[c];
-          const cells = (laneOff[ne + 1] - laneOff[ne]) / 6;
-          const base = laneOff[ne] + (nextDir[c] * 3 + nextLane[c]) * cells;
+          const cells = eCells[ne];
+          const base = laneBase[ne * 6 + nextDir[c] * 3 + nextLane[c]];
           const hc2 = nextDir[c] ? this.eHcB[ne] : this.eHcA[ne];
           const prog = (u[c] / curveL[c]) * hc2;
           const c1 = Math.min(cells - 1, Math.floor((prog + half) / CELL));
-          for (let k = 0; k <= c1; k++) put(base + k, prog - half, v[c]);
+          for (let k = 0; k <= c1; k++) put(base + k, prog - half, v[c], mark);
         } else {
           const eid = edge[c];
-          const cells = (laneOff[eid + 1] - laneOff[eid]) / 6;
+          const cells = eCells[eid];
           const c0 = Math.max(0, Math.floor((t[c] - half) / CELL)), c1 = Math.min(cells - 1, Math.floor((t[c] + half) / CELL));
-          const base = laneOff[eid] + (dir[c] * 3 + lane[c]) * cells;
-          for (let k = c0; k <= c1; k++) put(base + k, t[c] - half, v[c]);
-          if (laneFrom[c] !== lane[c]) { const b2 = laneOff[eid] + (dir[c] * 3 + laneFrom[c]) * cells; for (let k = c0; k <= c1; k++) put(b2 + k, t[c] - half, v[c]); }
+          const base = laneBase[eid * 6 + dir[c] * 3 + lane[c]];
+          for (let k = c0; k <= c1; k++) put(base + k, t[c] - half, v[c], mark);
+          if (laneFrom[c] !== lane[c]) { const b2 = laneBase[eid * 6 + dir[c] * 3 + laneFrom[c]]; for (let k = c0; k <= c1; k++) put(b2 + k, t[c] - half, v[c], mark); }
         }
       }
     }
+  }
+
+  update(dt, time, nodeCross) {
+    const { t, v, edge, dir, lane, laneFrom, lat, eLen, maxCars, grid, eCells, laneBase, eAxis, eAid, eBid, nextEdge, nextDir, nextLane, inTurn, u, curveL } = this;
+    const nState = this.signals.nState, nSignal = this.signals.nSignal;
+    const ranges = this.activeRanges;
+    ranges[0][1] = this.activeHw; ranges[1][1] = this.activeCars; ranges[2][1] = maxCars + this.activeBuses;
+    // 비활성 고속도로 차량은 지하 깊이 내려 숨김 (스케일 0 행렬은 법선 계산이 NaN 이 되어 블룸을 타고 화면 전체를 검게 만든다)
+    { const a = this.carMesh.instanceMatrix.array; for (let c = this.activeHw; c < this.renderedActiveHw; c++) { const o = c * 16; a[o] = 1; a[o + 5] = 1; a[o + 10] = 1; a[o + 13] = -400; } }
+    this.renderedActiveHw = this.activeHw;
+    this.buildOccupancy();
     // 2) 주행
     const carArr = this.carMesh.instanceMatrix.array, busArr = this.busMesh.instanceMatrix.array;
-    const pos = new THREE.Vector3();
+    const pos = this.turnPosition;
     for (const [s0, s1] of ranges) {
       for (let c = s0; c < s1; c++) {
         const isBus = c >= maxCars;
@@ -291,12 +322,12 @@ export class Traffic {
         let vd = this.maxSpeed(eid, c);
         let px, pz, yaw;
         if (!inTurn[c]) {
-          const cells = (laneOff[eid + 1] - laneOff[eid]) / 6;
-          const base = laneOff[eid] + (dir[c] * 3 + lane[c]) * cells;
+          const cells = eCells[eid];
+          const base = laneBase[eid * 6 + dir[c] * 3 + lane[c]];
           const frontCell = Math.min(cells - 1, Math.floor((t[c] + half) / CELL));
           const ne = nextEdge[c];
-          const ncells = (laneOff[ne + 1] - laneOff[ne]) / 6;
-          const nbase = laneOff[ne] + (nextDir[c] * 3 + nextLane[c]) * ncells;
+          const ncells = eCells[ne];
+          const nbase = laneBase[ne * 6 + nextDir[c] * 3 + nextLane[c]];
           // 앞차 탐색: 정지거리(v²/2a)에 맞춰 늘린다. 앞차의 꼬리 위치·속도로 IDM 가속도 계산
           const look = 4 + Math.ceil((v[c] * v[c]) / (2 * 6 * CELL));
           let gap = -1, lv = 0;
@@ -341,8 +372,8 @@ export class Traffic {
         if (inTurn[c]) {
           // 회전 중: 다음 엣지 차선의 앞 칸 점유 검사
           const ne = nextEdge[c];
-          const ncells = (laneOff[ne + 1] - laneOff[ne]) / 6;
-          const nbase = laneOff[ne] + (nextDir[c] * 3 + nextLane[c]) * ncells;
+          const ncells = eCells[ne];
+          const nbase = laneBase[ne * 6 + nextDir[c] * 3 + nextLane[c]];
           const hc2 = nextDir[c] ? this.eHcB[ne] : this.eHcA[ne];
           const prog = (u[c] / curveL[c]) * hc2;
           const myCell = Math.min(ncells - 1, Math.floor((prog + half) / CELL));
@@ -393,6 +424,8 @@ export class Traffic {
         a[o + 12] = px; a[o + 13] = inTurn[c] ? this.yAt(edge[c], dir[c], eLen[edge[c]]) : this.yAt(eid, dir[c], t[c]); a[o + 14] = pz;
       }
     }
+    this.carMesh.instanceMatrix.addUpdateRange(0, this.activeCars * 16);
+    this.busMesh.instanceMatrix.addUpdateRange(0, this.activeBuses * 16);
     this.carMesh.instanceMatrix.needsUpdate = true;
     this.busMesh.instanceMatrix.needsUpdate = true;
   }

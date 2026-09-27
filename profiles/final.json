@@ -1,0 +1,1970 @@
+[
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-baseline",
+    "fps": 20.393249834315174,
+    "frameMs": {
+      "n": 120,
+      "mean": 49.035833333308496,
+      "median": 49.599999994039536,
+      "p95": 140.59999999403954
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 9.829999999826153,
+      "median": 9.800000011920929,
+      "p95": 12.399999991059303
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.019166666517655053,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.2741666674613953,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.229999999329448,
+        "median": 3.2000000029802322,
+        "p95": 4
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.373333333308498,
+        "median": 5.4000000059604645,
+        "p95": 6.799999997019768
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.01833333360652129,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.006818181804139704,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.6299999999503295,
+        "median": 0.5999999940395355,
+        "p95": 0.9000000059604645
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.09416666614512602,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.06166666721304258,
+        "median": 0.09999999403953552,
+        "p95": 0.10000000894069672
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.010833333060145379,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.012500000124176344,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.013333333407839138,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.16250000149011612,
+        "median": 0.20000000298023224,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 104.93333333333334,
+      "median": 102,
+      "p95": 146
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631963.933333334,
+      "median": 20859589,
+      "p95": 32445213
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-no-streak",
+    "fps": 21.34851449919943,
+    "frameMs": {
+      "n": 120,
+      "mean": 46.84166666666667,
+      "median": 45.099999994039536,
+      "p95": 152.40000000596046
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 9.697500000273187,
+      "median": 9.799999997019768,
+      "p95": 11.5
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.015833333258827527,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.26833333348234495,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.1983333328117927,
+        "median": 3.2999999970197678,
+        "p95": 3.8999999910593033
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.352500000223517,
+        "median": 5.4000000059604645,
+        "p95": 6.299999997019768
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.007500000298023224,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3488,
+        "mean": 0.006049311916352412,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.5791666660457849,
+        "median": 0.5,
+        "p95": 0.9000000059604645
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.08833333340783914,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.05916666674117247,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.010000000397364298,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.01916666639347871,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.15000000223517418,
+        "median": 0.19999998807907104,
+        "p95": 0.29999999701976776
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 103.93333333333334,
+      "median": 101,
+      "p95": 145
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631962.933333334,
+      "median": 20859588,
+      "p95": 32445212
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-no-bloom",
+    "fps": 28.242603968046236,
+    "frameMs": {
+      "n": 120,
+      "mean": 35.40750000004967,
+      "median": 35.400000005960464,
+      "p95": 101.09999999403954
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 9.196666667610407,
+      "median": 9,
+      "p95": 11.299999997019768
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.011666667088866234,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.262500000372529,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.036666666592161,
+        "median": 3,
+        "p95": 3.8999999910593033
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.210833333556851,
+        "median": 5.0999999940395355,
+        "p95": 6.299999997019768
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0.0016666666915019354,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.011666666840513547,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 488,
+        "mean": 0.04057377054676658,
+        "median": 0,
+        "p95": 0.20000000298023224
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.5324999995529651,
+        "median": 0.5,
+        "p95": 0.7999999970197678
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.006666666641831398,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.014166666691501935,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.009166666865348816,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.13749999925494194,
+        "median": 0.10000000894069672,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 78.93333333333334,
+      "median": 76,
+      "p95": 120
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631937.933333334,
+      "median": 20859563,
+      "p95": 32445187
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-bloom-native-size",
+    "fps": 22.843654223246492,
+    "frameMs": {
+      "n": 120,
+      "mean": 43.775833333283664,
+      "median": 43.70000000298023,
+      "p95": 123.5
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 9.83250000079473,
+      "median": 10.099999994039536,
+      "p95": 11.700000002980232
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.010833333681027095,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.2750000006208817,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.200833332662781,
+        "median": 3.2999999970197678,
+        "p95": 3.800000011920929
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.479166666666667,
+        "median": 5.5,
+        "p95": 7
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.012500000124176344,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.0059312638556151065,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.5816666663934787,
+        "median": 0.5,
+        "p95": 0.9000000059604645
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.08833333440124988,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.05999999990065893,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.010833333308498064,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.009166666865348816,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.009166666741172473,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.13749999552965164,
+        "median": 0.19999998807907104,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 104.93333333333334,
+      "median": 102,
+      "p95": 146
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631963.933333334,
+      "median": 20859589,
+      "p95": 32445213
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-no-shadows",
+    "fps": 22.788560142821208,
+    "frameMs": {
+      "n": 120,
+      "mean": 43.881666666641834,
+      "median": 43.8999999910593,
+      "p95": 125.20000000298023
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 9.398333333432674,
+      "median": 9.600000008940697,
+      "p95": 11.799999997019768
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.0058333331098159155,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.2858333328117927,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.105000000571211,
+        "median": 3.2000000029802322,
+        "p95": 3.800000011920929
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.288333333780368,
+        "median": 5.4000000059604645,
+        "p95": 6.799999997019768
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0.0008333334078391393,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.00833333320915699,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.000221729501586267,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.43333333283662795,
+        "median": 0.3999999910593033,
+        "p95": 0.7000000029802322
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.08833333315948645,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.06500000009934108,
+        "median": 0.09999999403953552,
+        "p95": 0.10000000894069672
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.009166666865348816,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.0058333336065212885,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.00750000017384688,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.12499999813735485,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 75.93333333333334,
+      "median": 73,
+      "p95": 117
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 12358027.933333334,
+      "median": 11585653,
+      "p95": 23171277
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-no-trees",
+    "fps": 24.64116306286641,
+    "frameMs": {
+      "n": 120,
+      "mean": 40.58250000004967,
+      "median": 39.5,
+      "p95": 116.09999999403954
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 9.647499999403953,
+      "median": 9.700000002980232,
+      "p95": 11.700000002980232
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.009999999900658925,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.2741666667163372,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.1483333331843215,
+        "median": 3.2999999970197678,
+        "p95": 3.7999999970197678
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.428333333383004,
+        "median": 5.5,
+        "p95": 6.799999997019768
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0.0016666666915019354,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.013333333532015483,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.004961197311987898,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.4958333338300387,
+        "median": 0.5,
+        "p95": 0.7999999970197678
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.09333333348234495,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.057499999677141506,
+        "median": 0.09999999403953552,
+        "p95": 0.10000000894069672
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.009166666368643443,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.007499999677141507,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.012499999875823656,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.0624999962747097,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 63.6,
+      "median": 62,
+      "p95": 86
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 7293364.466666667,
+      "median": 6983525,
+      "p95": 11631117
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-no-postfx",
+    "fps": 34.4243954216437,
+    "frameMs": {
+      "n": 120,
+      "mean": 29.04916666659216,
+      "median": 28.799999997019768,
+      "p95": 80.79999999701977
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 8.599166666840514,
+      "median": 8.600000008940697,
+      "p95": 10.099999994039536
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.009166666492819785,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.2600000001490116,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 2.8508333336561917,
+        "median": 2.9000000059604645,
+        "p95": 3.2000000029802322
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 4.8691666655242445,
+        "median": 4.799999997019768,
+        "p95": 5.799999997019768
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0.002499999850988388,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.010833333432674407,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 248,
+        "mean": 0.07701612900822394,
+        "median": 0,
+        "p95": 0.20000000298023224
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.5116666674613952,
+        "median": 0.5,
+        "p95": 0.7999999970197678
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.019166666517655053,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.10000000149011612,
+        "median": 0.10000000894069672,
+        "p95": 0.10000000894069672
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 76.93333333333334,
+      "median": 74,
+      "p95": 118
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631935.933333334,
+      "median": 20859561,
+      "p95": 32445185
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-home-baseline-repeat",
+    "fps": 21.446571229379003,
+    "frameMs": {
+      "n": 120,
+      "mean": 46.62750000009934,
+      "median": 47.29999999701977,
+      "p95": 135.09999999403954
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 10.822499999900659,
+      "median": 10.799999997019768,
+      "p95": 14.299999997019768
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.006666666641831398,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.3325000005463759,
+        "median": 0.29999999701976776,
+        "p95": 0.5
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.6466666663686436,
+        "median": 3.7000000029802322,
+        "p95": 4.5
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 5.962500000124177,
+        "median": 6,
+        "p95": 7.5
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.008333333084980648,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.006042128614668307,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.5991666667163372,
+        "median": 0.5999999940395355,
+        "p95": 0.9000000059604645
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.10083333402872086,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.055833332364757855,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.009166666865348816,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.010000000149011612,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.0066666667660077415,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.11250000074505806,
+        "median": 0.10000000894069672,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 104.93333333333334,
+      "median": 102,
+      "p95": 146
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631963.933333334,
+      "median": 20859589,
+      "p95": 32445213
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-close-baseline",
+    "fps": 21.44695453244497,
+    "frameMs": {
+      "n": 120,
+      "mean": 46.6266666666915,
+      "median": 47.29999999701977,
+      "p95": 133.29999999701977
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 12.632499999552966,
+      "median": 12.700000002980232,
+      "p95": 14.599999994039536
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.010833333308498064,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.29499999855955444,
+        "median": 0.29999999701976776,
+        "p95": 0.4000000059604645
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.8091666674862306,
+        "median": 3.8999999910593033,
+        "p95": 4.600000008940697
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 4.974166666219632,
+        "median": 5,
+        "p95": 5.800000011920929
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 2.695833332464099,
+        "median": 2.7000000029802322,
+        "p95": 3.199999988079071
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.011666666964689891,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.005792682932611315,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.5775000004718701,
+        "median": 0.5,
+        "p95": 0.9000000059604645
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.0841666662444671,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.057500000670552255,
+        "median": 0.09999999403953552,
+        "p95": 0.10000000894069672
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.006666666641831398,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.009999999776482582,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.009166666865348816,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.125,
+        "median": 0.10000000894069672,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 106,
+      "median": 103,
+      "p95": 148
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21658461.433333334,
+      "median": 20884429,
+      "p95": 32494893
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 690.0333333333333,
+      "median": 690,
+      "p95": 690
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "day-close-no-pedestrians",
+    "fps": 22.101482641127177,
+    "frameMs": {
+      "n": 120,
+      "mean": 45.24583333333333,
+      "median": 45.20000000298023,
+      "p95": 127.79999999701977
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 12.415833333134652,
+      "median": 12.5,
+      "p95": 14.400000005960464
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.009166666865348816,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.28666666659216083,
+        "median": 0.29999999701976776,
+        "p95": 0.5
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 3.7358333339293797,
+        "median": 3.800000011920929,
+        "p95": 4.299999997019768
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 4.909166666741172,
+        "median": 5,
+        "p95": 6
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 2.6558333326131107,
+        "median": 2.7000000029802322,
+        "p95": 3
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.012500000124176344,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.005543237234034189,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.560000000273188,
+        "median": 0.5,
+        "p95": 0.8999999910593033
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.08750000012417634,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.04499999967714151,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.010833333432674407,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.006666666517655055,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.006666666517655055,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.08749999850988388,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 104.93333333333334,
+      "median": 102,
+      "p95": 146
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 21631963.933333334,
+      "median": 20859589,
+      "p95": 32445213
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "night-home-baseline",
+    "fps": 24.449877750611247,
+    "frameMs": {
+      "n": 120,
+      "mean": 40.9,
+      "median": 40.70000000298023,
+      "p95": 119.59999999403954
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 7.340000000596047,
+      "median": 7.5999999940395355,
+      "p95": 9.200000002980232
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.010000000149011612,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.3600000001490116,
+        "median": 0.30000001192092896,
+        "p95": 0.7000000029802322
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 2.161666666592161,
+        "median": 2.2000000029802322,
+        "p95": 2.9000000059604645
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 4.038333333656192,
+        "median": 4.199999988079071,
+        "p95": 5.200000002980232
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.008333333705862363,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "shadowSubmission": {
+        "n": 3608,
+        "mean": 0.000221729501586267,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.45749999992549417,
+        "median": 0.4000000059604645,
+        "p95": 0.7999999970197678
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.10666666651765505,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.06166666634380817,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.008333333084980648,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.008333333333333333,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.010833333681027095,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.13749999925494194,
+        "median": 0.20000000298023224,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 75.93333333333334,
+      "median": 73,
+      "p95": 117
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 12236901.533333333,
+      "median": 11472097,
+      "p95": 22944165
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "night-home-no-streak",
+    "fps": 27.309968138370504,
+    "frameMs": {
+      "n": 120,
+      "mean": 36.61666666666667,
+      "median": 36.599999994039536,
+      "p95": 105
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 7.0924999998261535,
+      "median": 7.100000008940697,
+      "p95": 9
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.006666666641831398,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.3358333328117927,
+        "median": 0.29999999701976776,
+        "p95": 0.5
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 2.0225000001490114,
+        "median": 2.0999999940395355,
+        "p95": 2.5
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 4.0075000004221994,
+        "median": 4,
+        "p95": 4.800000011920929
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0.0008333334078391393,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.007499999925494194,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "shadowSubmission": {
+        "n": 3488,
+        "mean": 0.0003440367023742527,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.43416666723787783,
+        "median": 0.4000000059604645,
+        "p95": 0.7999999970197678
+      },
+      "bloom": {
+        "n": 120,
+        "mean": 0.09249999970197678,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "bloomWide": {
+        "n": 120,
+        "mean": 0.06833333323399225,
+        "median": 0.09999999403953552,
+        "p95": 0.20000000298023224
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.00750000017384688,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.01416666644314925,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.1375000011175871,
+        "median": 0.10000000894069672,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 74.93333333333334,
+      "median": 72,
+      "p95": 116
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 12236900.533333333,
+      "median": 11472096,
+      "p95": 22944164
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  },
+  {
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "cpuThreads": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "gpuTimerSupported": true,
+      "gpuTimersEnabled": false,
+      "cssSize": [
+        1344,
+        836
+      ],
+      "dpr": 2,
+      "drawingBuffer": [
+        2688,
+        1672
+      ],
+      "composerSize": [
+        2688,
+        1672
+      ],
+      "composerPixelRatio": 2,
+      "targetSize": [
+        2688,
+        1672
+      ],
+      "bloomBrightSize": [
+        2688,
+        1672
+      ],
+      "bloomWideBrightSize": [
+        2688,
+        1672
+      ],
+      "msaa": 4
+    },
+    "scenario": "night-home-no-bloom",
+    "fps": 35.46832973727003,
+    "frameMs": {
+      "n": 120,
+      "mean": 28.19416666664183,
+      "median": 28.5,
+      "p95": 81.40000000596046
+    },
+    "frameCpuMs": {
+      "n": 120,
+      "mean": 6.430833333358168,
+      "median": 6.4000000059604645,
+      "p95": 7.5
+    },
+    "cpu": {
+      "sky": {
+        "n": 120,
+        "mean": 0.0024999999751647312,
+        "median": 0,
+        "p95": 0
+      },
+      "signals": {
+        "n": 120,
+        "mean": 0.3075000002980232,
+        "median": 0.29999999701976776,
+        "p95": 0.5
+      },
+      "pedestrianSimulation": {
+        "n": 120,
+        "mean": 1.8149999991059302,
+        "median": 1.7999999970197678,
+        "p95": 2.199999988079071
+      },
+      "traffic": {
+        "n": 120,
+        "mean": 3.756666667262713,
+        "median": 3.7000000029802322,
+        "p95": 4.4000000059604645
+      },
+      "pedestrianCullingAndPacking": {
+        "n": 120,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "subway": {
+        "n": 120,
+        "mean": 0.006666666890184084,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "shadowSubmission": {
+        "n": 488,
+        "mean": 0,
+        "median": 0,
+        "p95": 0
+      },
+      "sceneWithShadows": {
+        "n": 120,
+        "mean": 0.4141666663189729,
+        "median": 0.3999999910593033,
+        "p95": 0.7999999970197678
+      },
+      "streak": {
+        "n": 120,
+        "mean": 0.01750000019868215,
+        "median": 0,
+        "p95": 0.10000000894069672
+      },
+      "output": {
+        "n": 120,
+        "mean": 0.010833332935969034,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "vignette": {
+        "n": 120,
+        "mean": 0.012499999875823656,
+        "median": 0,
+        "p95": 0.09999999403953552
+      },
+      "exposureScene": {
+        "n": 8,
+        "mean": 0.08750000409781933,
+        "median": 0.10000000894069672,
+        "p95": 0.20000000298023224
+      }
+    },
+    "gpu": {},
+    "draws": {
+      "n": 120,
+      "mean": 49.93333333333333,
+      "median": 47,
+      "p95": 91
+    },
+    "triangles": {
+      "n": 120,
+      "mean": 12236875.533333333,
+      "median": 11472071,
+      "p95": 22944139
+    },
+    "peopleRendered": {
+      "n": 120,
+      "mean": 0,
+      "median": 0,
+      "p95": 0
+    },
+    "hiddenFrames": 0
+  }
+]

@@ -3,15 +3,17 @@
 //  - 횡단보도: 보행 초록일 때만 출발(빨강·점멸엔 절대 출발 금지), 횡단 중 인원을 교차로별로 집계해 차량이 양보
 //  - 진로 전환(직진/모서리 회전/유턴)은 위치가 끊기지 않게 처리, 횡방향 오프셋은 보간
 import * as THREE from 'three';
-import { SLAB_H, bridgeY } from './citygen.js';
+import { SLAB_H, BRIDGE_H, bridgeY } from './citygen.js';
 import { mulberry32 } from './noise.js';
 import { pedAllowed } from './signals.js';
+import { MemberBuckets } from './member-buckets.js';
 
 const CLOTHES = [
   [0.85, 0.2, 0.2], [0.2, 0.3, 0.7], [0.9, 0.9, 0.9], [0.15, 0.15, 0.18], [0.9, 0.7, 0.2], [0.3, 0.6, 0.35],
   [0.6, 0.4, 0.7], [0.95, 0.55, 0.3], [0.4, 0.45, 0.5], [0.75, 0.6, 0.5],
 ];
 const DETAIL_R = 2000;
+const RENDER_CELL = 512;
 const CROSS_SPEED = 1.9;
 const sgn = (x) => (x > 0 ? 1 : x < 0 ? -1 : 0);
 
@@ -32,6 +34,8 @@ export class People {
       this.eDx[id] = (e.b.x - e.a.x) / e.length; this.eDz[id] = (e.b.z - e.a.z) / e.length; this.eBridge[id] = e.bridge ? 1 : 0;
       this.eHcA[id] = (e.axis === 0 ? e.a.wv : e.a.wh) / 2; this.eHcB[id] = (e.axis === 0 ? e.b.wv : e.b.wh) / 2;
     }
+    this.nearEdge = new Uint8Array(E);
+    this.focusX = NaN; this.focusZ = NaN;
     this.nodeCross = new Uint16Array(city.nodes.length * 2);
     const walkable = city.edges.filter((e) => !e.highway && !e.ramp);
     this.edge = new Int32Array(max); this.dir = new Uint8Array(max); this.t = new Float32Array(max);
@@ -47,6 +51,9 @@ export class People {
       this.speed[c] = 1.0 + rng() * 0.8;
       this.chooseNext(c);
     }
+    this.edgeMembers = new MemberBuckets(E, max);
+    this.nearPeople = new Uint32Array(Math.ceil(max / 32));
+    for (let c = 0; c < max; c++) this.edgeMembers.move(c, this.edge[c]);
     const geo = new THREE.CapsuleGeometry(0.24, 1.15, 1, 6);
     geo.translate(0, 0.82, 0);
     const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
@@ -69,6 +76,38 @@ export class People {
     const a = this.mesh.instanceMatrix.array;
     for (let i = 0; i < max; i++) { const o = i * 16; a[o] = 1; a[o + 5] = 1; a[o + 10] = 1; a[o + 15] = 1; }
     this.writeAll();
+    // Keep simulation positions separate from the compact, visible GPU stream.
+    this.positions = this.mesh.instanceMatrix.array;
+    this.colors = this.mesh.instanceColor.array;
+    this.mesh.instanceMatrix = new THREE.InstancedBufferAttribute(new Float32Array(max * 16), 16).setUsage(THREE.DynamicDrawUsage);
+    this.mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(max * 3), 3).setUsage(THREE.DynamicDrawUsage);
+    this.renderIds = new Int32Array(max).fill(-1);
+    this.frustum = new THREE.Frustum();
+    this.viewProjection = new THREE.Matrix4();
+    this.bounds = new THREE.Sphere(new THREE.Vector3(), 1.5);
+    // Index the stored render positions, not the simulated edge: simOnly deliberately
+    // leaves distant render positions unchanged, exactly as the original implementation.
+    let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
+    for (const e of walkable) {
+      minX = Math.min(minX, e.a.x, e.b.x); minZ = Math.min(minZ, e.a.z, e.b.z);
+      maxX = Math.max(maxX, e.a.x, e.b.x); maxZ = Math.max(maxZ, e.a.z, e.b.z);
+    }
+    this.renderOriginX = Math.floor((minX - 128) / RENDER_CELL) * RENDER_CELL;
+    this.renderOriginZ = Math.floor((minZ - 128) / RENDER_CELL) * RENDER_CELL;
+    this.renderCols = Math.ceil((maxX + 128 - this.renderOriginX) / RENDER_CELL);
+    this.renderRows = Math.ceil((maxZ + 128 - this.renderOriginZ) / RENDER_CELL);
+    this.renderMembers = new MemberBuckets(this.renderCols * this.renderRows, max);
+    this.renderBoxes = Array.from({ length: this.renderMembers.head.length }, (_, cell) => {
+      const x = this.renderOriginX + (cell % this.renderCols) * RENDER_CELL;
+      const z = this.renderOriginZ + Math.floor(cell / this.renderCols) * RENDER_CELL;
+      const r = this.bounds.radius;
+      return new THREE.Box3(new THREE.Vector3(x - r, SLAB_H + 0.82 - r, z - r),
+        new THREE.Vector3(x + RENDER_CELL + r, SLAB_H + BRIDGE_H + 0.82 + r, z + RENDER_CELL + r));
+    });
+    this.visibleCells = new Int32Array(this.renderMembers.head.length);
+    this.visiblePeople = new Uint32Array(Math.ceil(max / 32));
+    for (let c = 0; c < max; c++) this.indexRenderPosition(c);
+    this.lastSimCandidates = this.lastRenderCandidates = 0;
   }
 
   // 엣지 종류별 횡방향 오프셋: 도로 = 인도, 격자 산책로 = 횡단보도 정렬, 내부 산책로 = 길 위
@@ -123,9 +162,10 @@ export class People {
     const o = c * 16;
     const ty = d ? this.eLen[eid] - this.t[c] : this.t[c];
     a[o + 12] = sx + dx * this.t[c] - dz * this.off[c]; a[o + 13] = SLAB_H + (this.eBridge[eid] ? bridgeY(this.eLen[eid], Math.min(this.eLen[eid], Math.max(0, ty))) : 0); a[o + 14] = sz + dz * this.t[c] + dx * this.off[c];
+    if (this.renderMembers) this.indexRenderPosition(c);
   }
   writeAll() {
-    const a = this.mesh.instanceMatrix.array;
+    const a = this.positions || this.mesh.instanceMatrix.array;
     for (let c = 0; c < this.max; c++) this.writePos(c, a);
     this.mesh.instanceMatrix.needsUpdate = true;
   }
@@ -133,13 +173,33 @@ export class People {
   update(dt, focus, simOnly = false) {
     const { edge, dir, t, off, offT, speed, eLen, eAx, eAz, eBx, eBz, eAid, eBid, eAxis, eHcA, eHcB, kind, crossing, nodeCross } = this;
     const nState = this.signals.nState, nSignal = this.signals.nSignal;
-    const a = this.mesh.instanceMatrix.array;
+    const a = this.positions;
     const fx = focus.x, fz = focus.z;
+    if (fx !== this.focusX || fz !== this.focusZ) {
+      for (let eid = 0; eid < eLen.length; eid++) {
+        const near = Math.abs((eAx[eid] + eBx[eid]) * 0.5 - fx) <= DETAIL_R &&
+          Math.abs((eAz[eid] + eBz[eid]) * 0.5 - fz) <= DETAIL_R ? 1 : 0;
+        if (near === this.nearEdge[eid]) continue;
+        this.nearEdge[eid] = near;
+        for (let c = this.edgeMembers.head[eid]; c !== -1; c = this.edgeMembers.next[c]) {
+          const bit = 1 << (c & 31);
+          if (near) this.nearPeople[c >>> 5] |= bit;
+          else this.nearPeople[c >>> 5] &= ~bit;
+        }
+      }
+      this.focusX = fx; this.focusZ = fz;
+    }
     nodeCross.fill(0);
-    for (let c = 0; c < this.active; c++) {
+    this.lastSimCandidates = 0;
+    // Visit candidates in ascending person ID to preserve the shared RNG sequence.
+    for (let wi = 0; wi < Math.ceil(this.active / 32); wi++) {
+      let word = this.nearPeople[wi];
+      while (word) {
+      const bit = word & -word; word ^= bit;
+      const c = wi * 32 + 31 - Math.clz32(bit);
+      if (c >= this.active) break;
+      this.lastSimCandidates++;
       let eid = edge[c];
-      const cx = (eAx[eid] + eBx[eid]) * 0.5, cz = (eAz[eid] + eBz[eid]) * 0.5;
-      if (Math.abs(cx - fx) > DETAIL_R || Math.abs(cz - fz) > DETAIL_R) continue;
       const len = eLen[eid], d = dir[c];
       const endId = d ? eAid[eid] : eBid[eid];
       const hc = d ? eHcA[eid] : eHcB[eid];
@@ -168,12 +228,98 @@ export class People {
         else if (k === 1) { t0 = Math.abs(off[c]); off[c] = no; offT[c] = no; } // 위치 연속: 옛 오프셋만큼 진행한 지점에서 시작
         else { t0 = len - tSwitch; off[c] = -off[c]; offT[c] = -offT[c]; }
         edge[c] = ne; dir[c] = nd; t[c] = t0 + over;
+        this.edgeMembers.move(c, ne);
+        if (this.nearEdge[ne]) this.nearPeople[c >>> 5] |= 1 << (c & 31);
+        else this.nearPeople[c >>> 5] &= ~(1 << (c & 31));
         if (crossing[c]) { const hc2 = nd ? eHcB[ne] : eHcA[ne]; this.crossEndT[c] = hc2 + 0.6; }
         this.chooseNext(c);
         eid = ne;
       }
       if (!simOnly) this.writePos(c, a);
+      }
     }
-    if (!simOnly) this.mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  indexRenderPosition(c) {
+    const a = this.positions, o = c * 16;
+    const x = a[o + 12], y = a[o + 13] + 0.82, z = a[o + 14];
+    const previous = this.renderMembers.bucket[c];
+    if (previous !== -1) {
+      const box = this.renderBoxes[previous], r = this.bounds.radius;
+      if (x >= box.min.x + r && x < box.max.x - r && z >= box.min.z + r && z < box.max.z - r &&
+          y >= box.min.y + r && y <= box.max.y - r) return;
+    }
+    const ix = Math.max(0, Math.min(this.renderCols - 1, Math.floor((x - this.renderOriginX) / RENDER_CELL)));
+    const iz = Math.max(0, Math.min(this.renderRows - 1, Math.floor((z - this.renderOriginZ) / RENDER_CELL)));
+    const cell = iz * this.renderCols + ix;
+    this.renderMembers.move(c, cell);
+    // Normally the fixed cell bounds already contain the complete walking height.
+    // Expand conservatively if an exceptional position lies beyond the world grid.
+    const box = this.renderBoxes[cell], r = this.bounds.radius;
+    box.min.x = Math.min(box.min.x, x - r); box.max.x = Math.max(box.max.x, x + r);
+    box.min.y = Math.min(box.min.y, y - r); box.max.y = Math.max(box.max.y, y + r);
+    box.min.z = Math.min(box.min.z, z - r); box.max.z = Math.max(box.max.z, z + r);
+  }
+
+  writeRenderInstance(c, index) {
+    const a = this.positions, dst = index * 16, o = c * 16;
+    const matrices = this.mesh.instanceMatrix.array;
+    for (let k = 0; k < 16; k++) matrices[dst + k] = a[o + k];
+    if (this.renderIds[index] === c) return false;
+    this.renderIds[index] = c;
+    const colors = this.mesh.instanceColor.array;
+    for (let k = 0; k < 3; k++) colors[index * 3 + k] = this.colors[c * 3 + k];
+    return true;
+  }
+
+  updateRender(camera) {
+    if (!this.mesh.visible) return;
+    camera.updateMatrixWorld();
+    this.viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    this.frustum.setFromProjectionMatrix(this.viewProjection);
+    const matrices = this.mesh.instanceMatrix, colors = this.mesh.instanceColor;
+    const a = this.positions, members = this.renderMembers;
+    this.lastRenderCandidates = 0;
+    let cellCount = 0, candidates = 0;
+    for (let cell = 0; cell < members.head.length; cell++) {
+      if (members.head[cell] === -1 || !this.frustum.intersectsBox(this.renderBoxes[cell])) continue;
+      this.visibleCells[cellCount++] = cell; candidates += members.size[cell];
+    }
+    let count = 0, colorChanged = false;
+    // Dense views are faster as a sequential scan than pointer-chasing through
+    // most buckets. Sparse views use the index and preserve the same ID order.
+    if (candidates > this.max * 0.25) {
+      this.lastRenderCandidates = this.active;
+      for (let c = 0; c < this.active; c++) {
+        const o = c * 16;
+        this.bounds.center.set(a[o + 12], a[o + 13] + 0.82, a[o + 14]);
+        if (!this.frustum.intersectsSphere(this.bounds)) continue;
+        colorChanged = this.writeRenderInstance(c, count++) || colorChanged;
+      }
+    } else {
+      this.visiblePeople.fill(0);
+      for (let i = 0; i < cellCount; i++) {
+        for (let c = members.head[this.visibleCells[i]]; c !== -1; c = members.next[c]) {
+          if (c >= this.active) continue;
+          this.lastRenderCandidates++;
+          const o = c * 16;
+          this.bounds.center.set(a[o + 12], a[o + 13] + 0.82, a[o + 14]);
+          if (this.frustum.intersectsSphere(this.bounds)) this.visiblePeople[c >>> 5] |= 1 << (c & 31);
+        }
+      }
+      for (let wi = 0; wi < Math.ceil(this.active / 32); wi++) {
+        let word = this.visiblePeople[wi];
+        while (word) {
+          const bit = word & -word; word ^= bit;
+          const c = wi * 32 + 31 - Math.clz32(bit);
+          colorChanged = this.writeRenderInstance(c, count++) || colorChanged;
+        }
+      }
+    }
+    this.mesh.count = count;
+    if (count) {
+      matrices.addUpdateRange(0, count * 16); matrices.needsUpdate = true;
+      if (colorChanged) { colors.addUpdateRange(0, count * 3); colors.needsUpdate = true; }
+    }
   }
 }
